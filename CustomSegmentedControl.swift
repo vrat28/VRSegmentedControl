@@ -26,6 +26,12 @@ import UIKit
         return normalSegmentsView.subviews
     }
     
+    private var selectedSegments:[UIView] {
+        return selectedSegmentsView.subviews
+    }
+    
+    private var segmentViews: [UIView] { return normalSegments + selectedSegments }
+    
     private var lastIndex: Int {
         return segments.endIndex - 1
     }
@@ -48,13 +54,34 @@ import UIKit
         }
     }
     
-    /// The duration of the animation of an index change. Defaults to `0.3`.
-    @IBInspectable public var animationDuration: TimeInterval = 1.0
-    /// The spring damping ratio of the animation of an index change. Defaults to `0.75`. Set to `1.0` for a no bounce effect.
+     var customizeOptions:[SegmentControlOptions]? {
+        get {
+            return nil
+        }
+        set {
+            guard let options = newValue else {
+                return
+            }
+            
+            for option in options {
+                switch option {
+                case .cornerRadius(let value):
+                    cornerRadius = value
+                    
+                case .selectorBackgroundColor(let newSelectorColor):
+                selectorBackgroundColor = newSelectorColor
+                default:
+                    print("")
+                }
+              
+            }
+            
+        }
+    }
     
+    @IBInspectable public var animationDuration: TimeInterval = 1.0
     @IBInspectable public var animationSpringDamping: CGFloat = 0.75
     @IBInspectable public var announcesValueImmediately: Bool = true
-    
     @IBInspectable public var indicatorViewBorderColor: UIColor? {
         get {
             guard let color = indicatorView.layer.borderColor else {
@@ -74,11 +101,32 @@ import UIKit
         }
     }
     
-    public init(frame:CGRect, segments:[CustomMaskSegment],defaultIndex: Int = 0) {
+     @IBInspectable public var selectorBackgroundColor: UIColor? {
+        get {
+            return indicatorView.backgroundColor
+        }
+        set {
+            indicatorView.backgroundColor = newValue
+        }
+    }
+    
+    @IBInspectable public var cornerRadius: CGFloat {
+        get {
+            return layer.cornerRadius
+        }
+        set {
+            layer.cornerRadius = newValue
+            updateCornerRadius()
+        }
+    }
+    
+    public init(frame:CGRect, segments:[CustomMaskSegment],defaultIndex: Int = 0, options:[SegmentControlOptions]? = nil) {
         self.selectedSegmentIndex = defaultIndex
         self.segments = segments
         super.init(frame: frame)
+        self.customizeOptions = options
         commonInit()
+        
     }
     
     required public init?(coder: NSCoder) {
@@ -123,8 +171,6 @@ import UIKit
             segment.selectedView.clipsToBounds = true
             selectedSegmentsView.addSubview(segment.selectedView)
         }
-        
-        
         
         layoutIfNeeded()
     }
@@ -188,6 +234,11 @@ import UIKit
     private func nearestIndex(toPoint point: CGPoint) -> Int {
         let distances = normalSegments.map { abs(point.x - $0.center.x) }
         return Int(distances.firstIndex(of: distances.min()!)!)
+    }
+    
+    private func updateCornerRadius() {
+        indicatorView.cornerRadius = cornerRadius - indicatorViewInset
+        segmentViews.forEach { $0.layer.cornerRadius = indicatorView.cornerRadius }
     }
     
     func moveIndicatorView(){
