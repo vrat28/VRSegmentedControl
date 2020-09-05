@@ -9,7 +9,7 @@ import UIKit
 
     open class IndicatorThumbView: UIView {
          let segmentMaskView = UIView()
-        fileprivate var cornerRadius: CGFloat = 0 {
+        open var cornerRadius: CGFloat = 0 {
             didSet {
                 layer.cornerRadius = cornerRadius
                 segmentMaskView.layer.cornerRadius = cornerRadius
@@ -30,6 +30,6 @@ import UIKit
             completeInit()
         }
         private func completeInit() {
-            segmentMaskView.backgroundColor = .black
+            segmentMaskView.backgroundColor = .white
         }
     }

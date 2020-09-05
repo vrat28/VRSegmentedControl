@@ -58,7 +58,7 @@ class CustomLabelSegment :CustomMaskSegment {
        let label =  UILabel()
        label.text = title
        label.font = font
-       label.backgroundColor = backgroundColor
+       label.backgroundColor = color
        label.textColor = textColor
        label.textAlignment = .center
        label.lineBreakMode = .byTruncatingTail
